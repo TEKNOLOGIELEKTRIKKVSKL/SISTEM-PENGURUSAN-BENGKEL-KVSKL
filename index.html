@@ -21,7 +21,7 @@
 <section id="settings" class="page panel hide"><h2>📍 TETAPAN PENTADBIR</h2><p>Masukkan latitud, longitud dan radius kawasan sekolah. Pastikan koordinat tepat sebelum mengaktifkan transaksi.</p><div class="grid"><div><label>LATITUD</label><input id="latitude" type="number" step="any"></div><div><label>LONGITUD</label><input id="longitude" type="number" step="any"></div><div><label>RADIUS (METER)</label><input id="radius" type="number" min="1"></div><div><label>FORMAT NO. SIRI KOLEJ</label><input id="serialFormat" value="KVSKL/{BENGKEL}/{KATEGORI}/{TAHUN}/{NOMBOR}"></div></div><p><button onclick="saveSettings()">SIMPAN TETAPAN</button></p></section>
 </main><section id="scanBox" class="panel hide"><h2>📷 IMBAS BARCODE</h2><div id="scanner"></div><button class="red" onclick="stopScan()">TUTUP KAMERA</button></section></div><footer>© KVSKL • SISTEM PENGURUSAN BENGKEL BERPUSAT</footer>
 <script>
-const API_URL='https://GANTIKAN-NAMA-WORKER.workers.dev/api';
+const API_URL='kvskl-bengkel-api.arifomar1101.workers.dev';
 let token='',data=null,scanInstance=null;
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
