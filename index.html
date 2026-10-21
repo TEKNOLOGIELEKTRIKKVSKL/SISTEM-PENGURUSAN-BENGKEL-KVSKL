@@ -28,7 +28,16 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=x=>'RM '+Number(x||0).toLocaleString('ms-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 const roles={admin:['PENTADBIR'],head:['PENTADBIR','KETUA BENGKEL'],manager:['PENTADBIR','KETUA BENGKEL','PEMBANTU KETUA BENGKEL']};
 function message(text,error=false){$('status').className=error?'notice':'success';$('status').textContent=text;setTimeout(()=>{if($('status').textContent===text)$('status').textContent=''},7500)}
-async function api(action,fields={}){const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token,...fields})});const out=await res.json();if(!out.ok)throw Error(out.error||'Ralat pelayan');return out.data;}
+async function api(action,fields={}){
+  let res;
+  try {
+    res=await fetch(API_URL,{method:'POST',mode:'cors',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token,...fields})});
+  }catch(e){throw Error('Tidak dapat menghubungi Cloudflare. Semak deployment Worker, CORS dan sambungan internet.');}
+  const raw=await res.text();let out;
+  try{out=JSON.parse(raw)}catch(_){throw Error('API tidak memulangkan JSON (HTTP '+res.status+'). Semak konfigurasi Worker dan Apps Script.');}
+  if(!res.ok||!out.ok)throw Error(out.error||'Ralat pelayan (HTTP '+res.status+')');
+  return out.data;
+}
 async function run(fn){try{await fn()}catch(e){message(e.message,true)}}
 async function login(){await run(async()=>{const result=await api('login',{email:$('email').value,password:$('password').value});token=result.token;sessionStorage.setItem('kvsklToken',token);$('password').value='';await refresh();message('Login berjaya')})}
 async function refresh(){await run(async()=>{data=await api('dashboard');$('loginBox').classList.add('hide');$('app').classList.remove('hide');$('who').textContent=data.user.name;$('role').textContent=data.user.role;for(const cls of Object.keys(roles))document.querySelectorAll('.'+cls).forEach(e=>e.classList.toggle('hide',!roles[cls].includes(data.user.role)));render();})}
